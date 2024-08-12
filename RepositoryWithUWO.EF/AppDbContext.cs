@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RepositoryWithUOW.Core.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RepositoryWithUWO.EF;
 
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext 
 {
     public DbSet<Author> Authors { get; set; }
     public DbSet<Book> Books { get; set; }

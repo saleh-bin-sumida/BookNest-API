@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryWithUOW.Core.Constants;
 using RepositoryWithUOW.Core.DTOs;
@@ -11,6 +12,8 @@ namespace RepositoryWithUWO.Api.Controllers;
 
 [ApiController]
 [Route("api/book")]
+
+[Authorize]
 public class BookController(IUnitOfWork BooksRepository, IMapper mapper) : ControllerBase
 {
     private IUnitOfWork _booksRepository = BooksRepository;
@@ -107,12 +110,17 @@ public class BookController(IUnitOfWork BooksRepository, IMapper mapper) : Contr
     }
 
 
-
+    [AllowAnonymous]
+    [Authorize]
     [HttpGet("SpeicalForBooks")]
-    public void SpeicalForBooks()
+    public IActionResult SpeicalForBooks()
     {
         //  author.Id = 0;
          _booksRepository.Books.SpecialMethodForBooks();
-
+        if (User.IsInRole("manager"))
+        {
+            return Ok();
+        }
+        return Forbid();
     }
 }

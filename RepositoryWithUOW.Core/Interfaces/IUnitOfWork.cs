@@ -12,6 +12,7 @@ namespace RepositoryWithUOW.Core.Interfaces
         public IBaseRepository<Author> Authors{ get; }
         public IBookRepository Books  { get; }
 
+
         public int Complete();
 
     }

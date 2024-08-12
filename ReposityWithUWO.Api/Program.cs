@@ -3,30 +3,80 @@ using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUWO.EF;
 using RepositoryWithUWO.EF.Repositories;
 using RepositoryWithUOW.Core.AutoMapperProfiles;
-
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using RepositoryWithUWO.Api;
+using RepositoryWithUOW.EF.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-var Constr = builder.Configuration.GetSection("ConnectionsStrings:DefaultConnections").Value;
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+builder.Services.AddSingleton(jwtOptions);
 
+
+// register EF
+var Constr = builder.Configuration.GetSection("ConnectionsStrings:DefaultConnections").Value;
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(Constr,
 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
-//builder.Services.AddTransient(typeof(IBaseRepository<>),typeof(BaseRepository<>));
+
+
+// register Identity
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredUniqueChars = 0;
+    options.Password.RequiredLength = 5;
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+
+
+// register objects
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>( );
+builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddAutoMapper(typeof(ProfileMapper).Assembly);
+
+
+
+// register authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+    {
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issure,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
+
+        };
+    });
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

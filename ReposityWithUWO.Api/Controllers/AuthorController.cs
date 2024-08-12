@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryWithUOW.Core.DTOs;
 using RepositoryWithUOW.Core.Interfaces;
@@ -17,18 +18,19 @@ public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : C
     private readonly IMapper mapper = mapper;
 
 
-
-    [HttpGet]
+    [HttpGet()]
     public async Task<IActionResult> GetAuthorsAsync()
     {
         var authors = await _authorsRepository.Authors.IndexAsync();
-        return Ok(mapper.Map<IEnumerable< AuthorDTO>>(authors));
+        return Ok(mapper.Map<IEnumerable<AuthorDTO>>(authors));
     }
 
 
 
     [HttpGet]
     [Route("{Id}")]
+    [Authorize]
+
     public async Task<IActionResult> GetAuthorById(int Id)
     {
         var autor =  (await _authorsRepository.Authors.Find(x => x.Id == Id));
@@ -38,7 +40,7 @@ public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : C
 
 
 
-        [HttpGet("GetAuthorByName")]
+     [HttpGet("GetAuthorByName")]
     public async Task<IActionResult> GetAuthorByName(string name)
     {
         var autor = (await _authorsRepository.Authors.Find(x => x.Name == name));
