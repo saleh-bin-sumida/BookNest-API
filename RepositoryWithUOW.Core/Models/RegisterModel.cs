@@ -5,7 +5,9 @@ namespace RepositoryWithUOW.Core.Models;
 
 public class RegisterModel
 {
-    public string Usrname { get; set; }
+    [Required]
+
+    public string UserName { get; set; }
 
     [Required]
     public string FullName { get; set; }

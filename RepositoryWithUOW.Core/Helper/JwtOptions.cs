@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-
-namespace RepositoryWithUWO.Api;
+﻿
+namespace RepositoryWithUWO.Core.Helper;
 
 public class JwtOptions
 {

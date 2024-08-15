@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUOW.Core.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,9 +13,9 @@ namespace RepositoryWithUWO.Api.Controllers;
 
 [Route("api/auth")]
 [ApiController]
-public class AuthController(IUserServices userServices, JwtOptions jwtOptions) : ControllerBase
+public class AuthController(IAuthServices userServices) : ControllerBase
 {
-    private IUserServices _userServices  = userServices;
+    private IAuthServices _userServices  = userServices;
 
 
 
@@ -26,10 +27,10 @@ public class AuthController(IUserServices userServices, JwtOptions jwtOptions) :
         
         var result = await _userServices.RegisterUserAsync(registerModel);
 
-        if (result.IsSucced)
-            return Ok(result);
+        if (!result.IsAuthenticated)
+            return BadRequest(result.Message);
 
-        return BadRequest(result.Errors.FirstOrDefault());
+        return Ok(result);
 
             
     }
@@ -41,36 +42,39 @@ public class AuthController(IUserServices userServices, JwtOptions jwtOptions) :
         if (!ModelState.IsValid)
             return BadRequest("some proprites are not valid");
 
-        var result = await _userServices.Login(loginModel);
+        var result = await _userServices.LoginAsync(loginModel);
 
-        if (result.IsSucced)
-            return Ok( GenerateToken(loginModel));
+        if (!result.IsAuthenticated)
+            return BadRequest(result.Message);
 
-        return BadRequest("incorrect usrname or password");
+        return Ok(result);
     }
 
 
-
-    private string GenerateToken(LoginModel login)
+    [HttpPost("AddUserToRole")]
+    public async Task<IActionResult> AddUserToRoleAsync(string role, string Username)
     {
-        var TokenHandler = new JwtSecurityTokenHandler();
-        var TokenDescriptor = new SecurityTokenDescriptor
-        {
-            Issuer = jwtOptions.Issure,
-            Audience = jwtOptions.Audience,
-            SigningCredentials = 
-            new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
-            SecurityAlgorithms.HmacSha256),
-            Subject = new ClaimsIdentity(new Claim[]
-            {
-                new Claim (ClaimTypes.Name, login.Username),
-            })
-        };
+        if (!ModelState.IsValid)
+            return BadRequest("some proprites are not valid");
 
-        var securityToken = TokenHandler.CreateToken(TokenDescriptor);
-        var AccessToken = TokenHandler.WriteToken(securityToken);
-        return AccessToken;
+        if (!await _userServices.AddUserToRoleAsync(role, Username))
+            return BadRequest("User didnt added to the provided role");
 
+        return Ok($"{Username} add to the role `{role}`");
     }
+
+    [HttpPost("CreateRole")]
+    public async Task<IActionResult> CreateRoleAsync(string role)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("some proprites are not valid");
+
+        if (!await _userServices.CreateRoleAsync(role))
+            return BadRequest("role did not create");
+
+        return Ok($"`{role}` role Created Succesfully");
+    }
+
+
 
 }

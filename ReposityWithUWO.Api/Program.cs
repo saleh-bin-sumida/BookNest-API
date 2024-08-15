@@ -10,6 +10,7 @@ using System.Text;
 using RepositoryWithUWO.Api;
 using RepositoryWithUOW.Core.Services;
 using RepositoryWithUOW.Core.Entites;
+using RepositoryWithUWO.Core.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 // register objects
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>( );
-builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddAutoMapper(typeof(ProfileMapper).Assembly);
 
 

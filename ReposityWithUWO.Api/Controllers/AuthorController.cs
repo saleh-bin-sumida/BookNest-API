@@ -9,7 +9,7 @@ using RepositoryWithUWO.EF.Repositories;
 
 
 namespace RepositoryWithUOW.Api.Controllers;
-
+[Authorize]
 [ApiController]
 [Route("api/author")]
 public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : ControllerBase
