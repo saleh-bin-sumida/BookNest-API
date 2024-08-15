@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using RepositoryWithUOW.Core.DTOs;
-using RepositoryWithUOW.Core.Models;
+using RepositoryWithUOW.Core.Entites;
 
 
 namespace RepositoryWithUOW.Core.AutoMapperProfiles;

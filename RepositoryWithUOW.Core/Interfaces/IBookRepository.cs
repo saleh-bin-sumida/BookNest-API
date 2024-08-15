@@ -1,4 +1,4 @@
-﻿using RepositoryWithUOW.Core.Models;
+﻿using RepositoryWithUOW.Core.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;

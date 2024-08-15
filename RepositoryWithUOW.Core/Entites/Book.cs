@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Principal;
 
-namespace RepositoryWithUOW.Core.Models;
+namespace RepositoryWithUOW.Core.Entites;
 
 public class Book
 {
@@ -11,5 +11,5 @@ public class Book
     public int AuthorId { get; set; }
     public required Author Author { get; set; }
 
-    public DateTime CreatedDate { get; set; }  = DateTime.Now;
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
 }

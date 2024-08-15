@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUOW.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RepositoryWithUOW.EF.Services;
 
-public class UserServices(UserManager<IdentityUser> userManager) : IUserServices
+namespace RepositoryWithUOW.Core.Services;
+
+public class UserServices(UserManager<ApplicationUser> userManager) : IUserServices
 {
-    public UserManager<IdentityUser> _userManager  = userManager;
+    public UserManager<ApplicationUser> _userManager = userManager;
 
 
 
@@ -24,16 +20,16 @@ public class UserServices(UserManager<IdentityUser> userManager) : IUserServices
 
 
         if (model.Password != model.ConfirmPassword)
-            return  new UserManagerResponse("confirm password doesnt match password", false);
+            return new UserManagerResponse("confirm password doesnt match password", false);
 
-        var identityUser = new IdentityUser { Email = model.Email, UserName = model.Usrname };
+        var identityUser = new ApplicationUser { Email = model.Email, UserName = model.Usrname,FullName = model.FullName };
 
-        var result = await( _userManager.CreateAsync(identityUser, model.Password));
+        var result = await (_userManager.CreateAsync(identityUser, model.Password));
 
         if (result.Succeeded)
             return new UserManagerResponse("User is created succefully", true);
 
-        return new UserManagerResponse("User did not created", false,result.Errors.Select( e => e.Description));
+        return new UserManagerResponse("User did not created", false, result.Errors.Select(e => e.Description));
 
     }
 
@@ -45,12 +41,12 @@ public class UserServices(UserManager<IdentityUser> userManager) : IUserServices
         var user = await _userManager.FindByNameAsync(model.Username);
 
         if (user is null)
-            return new UserManagerResponse("no user with that username",false);
+            return new UserManagerResponse("no user with that username", false);
 
         var IsUser = await _userManager.CheckPasswordAsync(user, model.Password);
 
         if (IsUser)
-            return new UserManagerResponse("password is correct",true);
+            return new UserManagerResponse("password is correct", true);
 
         return new UserManagerResponse("invalid password", false);
 

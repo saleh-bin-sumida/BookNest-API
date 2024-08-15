@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace RepositoryWithUOW.Core.Models;
+namespace RepositoryWithUOW.Core.Entites;
 
 public class Author
 {
@@ -22,5 +22,5 @@ public class Author
     [JsonIgnore]
     public List<Book> Books { get; set; } = new();
 
- 
+
 }

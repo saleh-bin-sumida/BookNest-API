@@ -7,6 +7,9 @@ public class RegisterModel
 {
     public string Usrname { get; set; }
 
+    [Required]
+    public string FullName { get; set; }
+
     [EmailAddress]
     public string Email { get; set; }
 

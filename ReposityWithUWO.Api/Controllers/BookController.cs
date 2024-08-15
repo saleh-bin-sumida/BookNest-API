@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryWithUOW.Core.Constants;
 using RepositoryWithUOW.Core.DTOs;
+using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
-using RepositoryWithUOW.Core.Models;
 using static System.Reflection.Metadata.BlobBuilder;
 
 

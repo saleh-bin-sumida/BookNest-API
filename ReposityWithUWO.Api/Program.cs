@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RepositoryWithUWO.Api;
-using RepositoryWithUOW.EF.Services;
+using RepositoryWithUOW.Core.Services;
+using RepositoryWithUOW.Core.Entites;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 
 // register Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = false;

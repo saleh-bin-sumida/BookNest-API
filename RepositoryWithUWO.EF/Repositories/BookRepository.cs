@@ -1,5 +1,5 @@
-﻿using RepositoryWithUOW.Core.Interfaces;
-using RepositoryWithUOW.Core.Models;
+﻿using RepositoryWithUOW.Core.Entites;
+using RepositoryWithUOW.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

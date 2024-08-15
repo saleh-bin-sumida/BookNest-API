@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUOW.Core.Constants;
-
-
 using System.Linq.Expressions;
-using System.Linq;
-using System.Diagnostics.Metrics;
 
 
 namespace RepositoryWithUWO.EF.Repositories;

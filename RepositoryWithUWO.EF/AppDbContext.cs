@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using RepositoryWithUOW.Core.Models;
+using RepositoryWithUOW.Core.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RepositoryWithUWO.EF;
 
-public class AppDbContext : IdentityDbContext 
+public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public DbSet<Author> Authors { get; set; }
     public DbSet<Book> Books { get; set; }
@@ -29,8 +29,13 @@ public class AppDbContext : IdentityDbContext
             .WithMany(x => x.Books)
             .HasForeignKey(x => x.AuthorId)
             .IsRequired(true)
-            ) ;
+            );
 
+
+        modelBuilder.Entity<ApplicationUser>(
+           entity => entity
+           .Property(x => x.FullName).HasMaxLength(200)
+           );
 
     }
 
