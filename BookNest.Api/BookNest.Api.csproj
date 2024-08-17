@@ -26,8 +26,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RepositoryWithUOW.Core\BookNested.Core.csproj" />
-    <ProjectReference Include="..\RepositoryWithUWO.EF\BookNested.EF.csproj" />
+    <ProjectReference Include="..\BookNest.Core\BookNest.Core.csproj" />
+    <ProjectReference Include="..\BookNest.EF\BookNest.EF.csproj" />
   </ItemGroup>
 
 </Project>
