@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWithUWO.Api", "ReposityWithUWO.Api\RepositoryWithUWO.Api.csproj", "{7C981F26-B194-43A9-ABAC-B6E83BAF7AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookNested.Api", "ReposityWithUWO.Api\BookNested.Api.csproj", "{7C981F26-B194-43A9-ABAC-B6E83BAF7AC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWithUOW.Core", "RepositoryWithUOW.Core\RepositoryWithUOW.Core.csproj", "{DD53152C-7EA4-4F56-A7A8-CF37FC308CB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookNested.Core", "RepositoryWithUOW.Core\BookNested.Core.csproj", "{DD53152C-7EA4-4F56-A7A8-CF37FC308CB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepositoryWithUWO.EF", "RepositoryWithUWO.EF\RepositoryWithUWO.EF.csproj", "{E10E6D7F-048F-4C0B-8FC2-F197443A4034}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookNested.EF", "RepositoryWithUWO.EF\BookNested.EF.csproj", "{E10E6D7F-048F-4C0B-8FC2-F197443A4034}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
