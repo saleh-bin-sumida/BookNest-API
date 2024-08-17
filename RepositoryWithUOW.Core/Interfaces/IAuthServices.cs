@@ -16,6 +16,8 @@ public interface IAuthServices //: IBaseRepository<User>
     public Task<bool> AddUserToRoleAsync(string Role, string Username);
     public Task<bool> CreateRoleAsync(string Role);
 
+    public Task<AuthModel> RefreshTokenAsync(string refreshToken);
+    public Task<bool> RevokeTokenAsync(string refreshToken);
 
 
 

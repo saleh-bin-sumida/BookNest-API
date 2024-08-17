@@ -1,13 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUOW.Core.Models;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace RepositoryWithUWO.Api.Controllers;
 
@@ -18,22 +13,32 @@ public class AuthController(IAuthServices userServices) : ControllerBase
     private IAuthServices _userServices  = userServices;
 
 
+    [HttpGet("test")]
+    [Authorize]
+    public async Task<IActionResult> get()
+    {
+        return Ok("yes here we go");
+    }
+
+
+
 
     [HttpPost("Register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterModel registerModel)
     {
         if (!ModelState.IsValid)
-            return BadRequest("some proprites are not valid");
+            return BadRequest(ModelState);
         
         var result = await _userServices.RegisterUserAsync(registerModel);
 
         if (!result.IsAuthenticated)
             return BadRequest(result.Message);
 
-        return Ok(result);
-
-            
+        SetRefreshTokenInCookies(result.RefreshToken, result.RefreshTokenExpiration);
+        return Ok(result);        
     }
+
+
 
 
     [HttpPost("login")]
@@ -47,8 +52,13 @@ public class AuthController(IAuthServices userServices) : ControllerBase
         if (!result.IsAuthenticated)
             return BadRequest(result.Message);
 
+        if (!string.IsNullOrEmpty(result.RefreshToken))
+            SetRefreshTokenInCookies(result.RefreshToken,result.RefreshTokenExpiration);
+
         return Ok(result);
     }
+
+
 
 
     [HttpPost("AddUserToRole")]
@@ -62,6 +72,9 @@ public class AuthController(IAuthServices userServices) : ControllerBase
 
         return Ok($"{Username} add to the role `{role}`");
     }
+
+
+
 
     [HttpPost("CreateRole")]
     public async Task<IActionResult> CreateRoleAsync(string role)
@@ -77,4 +90,58 @@ public class AuthController(IAuthServices userServices) : ControllerBase
 
 
 
+
+    [HttpGet("RefreshToken")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("some proprites are not valid");
+
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        var result = await _userServices.RefreshTokenAsync(refreshToken);
+
+        if (!result.IsAuthenticated)
+            return BadRequest(result);
+
+
+        if (!string.IsNullOrEmpty(result.RefreshToken))
+            SetRefreshTokenInCookies(result.RefreshToken, result.RefreshTokenExpiration);
+
+        return Ok(result);
+    }
+
+
+
+
+    [HttpPost("RevokeToken")]
+    public async Task<IActionResult> RevokeTokenAsync([FromBody] RevokeToken model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("some proprites are not valid");
+
+        var TokenToRevoke = model.Token ?? Request.Cookies["refreshToken"];
+
+        if (string.IsNullOrEmpty(TokenToRevoke))
+            return BadRequest("token is required!");
+
+
+        if (!await _userServices.RevokeTokenAsync(TokenToRevoke))
+            return BadRequest("token invalid or inactive");
+
+        return Ok("token revoked sussecfully");
+    }
+
+
+
+
+    private void SetRefreshTokenInCookies(string refreshToken, DateTime ExpirsOn)
+    {
+        var cookiesOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = ExpirsOn.ToLocalTime(),
+        };
+        Response.Cookies.Append("refreshToken", refreshToken, cookiesOptions);
+    }
 }

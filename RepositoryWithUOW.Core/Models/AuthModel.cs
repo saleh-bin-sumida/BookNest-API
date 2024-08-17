@@ -15,11 +15,10 @@ public class AuthModel
     public string? Email{ get; set; }
     public IEnumerable<string>? Roles { get; set; }
     public string? Token { get; set; }
-    public DateTime? ExpirsOn { get; set; }
+    // public DateTime? ExpirsOn { get; set; }
 
-    //public IEnumerable<string> Errors { get; set; }
-    //[JsonIgnore]
-    //public string? RefreshToken { get; set; }
-    //public DateTime RefreshTokenExpiration { get; set; }
+    [JsonIgnore]
+    public string? RefreshToken { get; set; }
+    public DateTime RefreshTokenExpiration { get; set; }
 
 }

@@ -33,7 +33,7 @@ b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 // register Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
+{   
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
@@ -64,14 +64,13 @@ builder.Services.AddAuthentication(options =>
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-
             ValidateIssuer = true,
             ValidIssuer = jwtOptions.Issure,
             ValidateAudience = true,
             ValidAudience = jwtOptions.Audience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
-
+            ClockSkew = TimeSpan.Zero
         };
     });
 
