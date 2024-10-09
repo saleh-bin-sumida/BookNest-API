@@ -5,6 +5,7 @@ namespace RepositoryWithUOW.Core.Entites;
 
 public class Book
 {
+  
     public int Id { get; set; }
     [MaxLength(100)]
     public required string Title { get; set; }

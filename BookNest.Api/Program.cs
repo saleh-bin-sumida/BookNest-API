@@ -24,7 +24,7 @@ builder.Services.AddSingleton(jwtOptions);
 
 
 // register EF
-var Constr = builder.Configuration.GetSection("ConnectionsStrings:DefaultConnections").Value;
+var Constr = builder.Configuration.GetSection("ConnectionsStrings:ProductionConnection").Value;
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(Constr,
 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));

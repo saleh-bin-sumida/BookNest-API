@@ -27,6 +27,8 @@ public class BaseRepository<T>(AppDbContext appDbContext) : IBaseRepository<T> w
         return await values.ToListAsync();
     }
 
+
+
     public async Task< T> Find(Expression<Func<T, bool>> predicate, string[] includes = null)
     {
         IQueryable<T> values = _appDbContext.Set<T>();
