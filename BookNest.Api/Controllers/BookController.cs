@@ -13,7 +13,7 @@ namespace RepositoryWithUWO.Api.Controllers;
 [ApiController]
 [Route("api/book")]
 
-[Authorize]
+//[Authorize]
 public class BookController(IUnitOfWork BooksRepository, IMapper mapper) : ControllerBase
 {
     private IUnitOfWork _booksRepository = BooksRepository;
