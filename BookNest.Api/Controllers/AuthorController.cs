@@ -6,14 +6,15 @@ using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
 
 
-namespace RepositoryWithUOW.Api.Controllers;
-[Authorize]
+namespace RepositoryWithUOW.Api.Controllers;///
+//[Authorize]
 [ApiController]
 [Route("api/author")]
 public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : ControllerBase
 {
     private IUnitOfWork _authorsRepository = authorsRepository;
     private readonly IMapper mapper = mapper;
+
 
 
     [HttpGet()]
@@ -29,7 +30,7 @@ public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : C
 
     [HttpGet]
     [Route("{Id}")]
-    [Authorize]
+    //[Authorize]
 
     public async Task<IActionResult> GetAuthorById(int Id)
     {
