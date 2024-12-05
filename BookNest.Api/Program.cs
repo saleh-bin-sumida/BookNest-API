@@ -1,16 +1,15 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using RepositoryWithUOW.Core.AutoMapperProfiles;
+using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
+using RepositoryWithUOW.Core.Services;
+using RepositoryWithUWO.Core.Helper;
 using RepositoryWithUWO.EF;
 using RepositoryWithUWO.EF.Repositories;
-using RepositoryWithUOW.Core.AutoMapperProfiles;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using RepositoryWithUWO.Api;
-using RepositoryWithUOW.Core.Services;
-using RepositoryWithUOW.Core.Entites;
-using RepositoryWithUWO.Core.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +23,7 @@ builder.Services.AddSingleton(jwtOptions);
 
 
 // register EF
-var Constr = builder.Configuration.GetSection("ConnectionsStrings:DefaultConnections").Value;
+var Constr = builder.Configuration.GetSection("ConnectionsStrings:ProductionConnection").Value;
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(Constr,
 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
@@ -33,7 +32,7 @@ b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 // register Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{   
+{
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
@@ -47,7 +46,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 
 // register objects
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>( );
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddAutoMapper(typeof(ProfileMapper).Assembly);
 

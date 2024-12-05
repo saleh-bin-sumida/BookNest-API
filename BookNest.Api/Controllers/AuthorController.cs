@@ -1,99 +1,71 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryWithUOW.Core.DTOs;
 using RepositoryWithUOW.Core.Entites;
 using RepositoryWithUOW.Core.Interfaces;
 
-
-namespace RepositoryWithUOW.Api.Controllers;///
-//[Authorize]
-[ApiController]
-[Route("api/author")]
-public class AuthorController(IUnitOfWork authorsRepository, IMapper mapper) : ControllerBase
+namespace RepositoryWithUOW.Api.Controllers
 {
-    private IUnitOfWork _authorsRepository = authorsRepository;
-    private readonly IMapper mapper = mapper;
-
-
-
-    [HttpGet()]
-    public async Task<IActionResult> GetAuthorsAsync()
+    [ApiController]
+    [Route("api/author")]
+    public class AuthorController(IUnitOfWork unitOfWork, IMapper mapper) : ControllerBase
     {
-        var authors = await _authorsRepository.Authors.IndexAsync();
-        return Ok(mapper.Map<IEnumerable<AuthorDTO>>(authors));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+
+        [HttpGet]
+        public async Task<IActionResult> GetAsync()
+        {
+            var authors = await _unitOfWork.Authors.IndexAsync();
+            return Ok(authors);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAuthorById(int id)
+        {
+            var author = await _unitOfWork.Authors.Find(x => x.Id == id);
+            if (author == null)
+            {
+                return NotFound();
+            }
+            return Ok(author);
+        }
+
+        [HttpGet("GetAuthorByName")]
+        public async Task<IActionResult> GetAuthorByName(string name)
+        {
+            var author = await _unitOfWork.Authors.Find(x => x.Name == name);
+            if (author == null)
+            {
+                return NotFound();
+            }
+            return Ok(author);
+        }
+
+        [HttpPost("AddAuthor")]
+        public async Task<IActionResult> AddAuthor(AuthorDTO authorDto)
+        {
+            var author = _mapper.Map<Author>(authorDto);
+            await _unitOfWork.Authors.Add(author);
+            await _unitOfWork.CompleteAsync();
+            return Ok(author.Id);
+        }
+
+        [HttpPut("UpdateAuthor")]
+        public async Task<IActionResult> UpdateAuthor(AuthorDTO authorDto)
+        {
+            var updatedAuthor = _mapper.Map<Author>(authorDto);
+            await _unitOfWork.Authors.Update(updatedAuthor);
+            await _unitOfWork.CompleteAsync();
+            return Ok(updatedAuthor.Id);
+        }
+
+        [HttpDelete("DeleteAuthor")]
+        public async Task<IActionResult> DeleteAuthor(int authorId)
+        {
+            await _unitOfWork.Authors.Delete(authorId);
+            await _unitOfWork.CompleteAsync();
+            return Ok(authorId);
+        }
     }
-
-
-
-
-
-    [HttpGet]
-    [Route("{Id}")]
-    //[Authorize]
-
-    public async Task<IActionResult> GetAuthorById(int Id)
-    {
-        var autor = (await _authorsRepository.Authors.Find(x => x.Id == Id));
-        return Ok(mapper.Map<AuthorDTO>(autor));
-    }
-
-
-
-
-    [HttpGet("GetAuthorByName")]
-    public async Task<IActionResult> GetAuthorByName(string name)
-    {
-        var autor = (await _authorsRepository.Authors.Find(x => x.Name == name));
-        return Ok(mapper.Map<AuthorDTO>(autor));
-    }
-
-
-
-
-
-    [HttpPost("AddAuthor")]
-    public async Task<IActionResult> AddAuthor(AuthorDTO author)
-    {
-        var NewAuthor = mapper.Map<Author>(author);
-        NewAuthor.Id = 0;
-
-        await _authorsRepository.Authors.Add(NewAuthor);
-        _authorsRepository.Complete();
-
-        return Ok(NewAuthor.Id);
-    }
-
-
-
-
-    [HttpPut("UpdateAuthor")]
-    public async Task<IActionResult> UpdateAuthor(AuthorDTO author)
-    {
-        //  author.Id = 0;
-        var UpdatedAuthor = mapper.Map<Author>(author);
-
-        await _authorsRepository.Authors.Update(UpdatedAuthor);
-        _authorsRepository.Complete();
-
-        return Ok(UpdatedAuthor.Id);
-    }
-
-
-
-
-
-    [HttpDelete("DeleteAuthor")]
-    public async Task<IActionResult> DeleteAuthor(int authorId)
-    {
-        //  author.Id = 0;
-        await _authorsRepository.Authors.Delete(authorId);
-        _authorsRepository.Complete();
-
-        return Ok(authorId);
-    }
-
 }
-
-
-
