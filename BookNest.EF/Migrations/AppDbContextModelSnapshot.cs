@@ -8,7 +8,7 @@ using RepositoryWithUWO.EF;
 
 #nullable disable
 
-namespace RepositoryWithUWO.EF.Migrations
+namespace BookNest.EF.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -175,7 +175,6 @@ namespace RepositoryWithUWO.EF.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 

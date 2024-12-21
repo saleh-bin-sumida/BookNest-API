@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RepositoryWithUOW.Core.Interfaces;
 using RepositoryWithUOW.Core.Constants;
+using RepositoryWithUOW.Core.Interfaces;
 using System.Linq.Expressions;
 
 
@@ -8,11 +8,9 @@ namespace RepositoryWithUWO.EF.Repositories;
 
 public class BaseRepository<T>(AppDbContext appDbContext) : IBaseRepository<T> where T : class
 {
-    private AppDbContext _appDbContext  = appDbContext;
+    private AppDbContext _appDbContext = appDbContext;
 
-
-
-    public async Task<IEnumerable<T>> IndexAsync(string[] includes = null)
+    public async Task<IEnumerable<T>> GetAllAsync(string[] includes = null)
     {
         IQueryable<T> values = _appDbContext.Set<T>();
 
@@ -27,9 +25,7 @@ public class BaseRepository<T>(AppDbContext appDbContext) : IBaseRepository<T> w
         return await values.ToListAsync();
     }
 
-
-
-    public async Task< T> Find(Expression<Func<T, bool>> predicate, string[] includes = null)
+    public async Task<T> FindAsync(Expression<Func<T, bool>> predicate, string[] includes = null)
     {
         IQueryable<T> values = _appDbContext.Set<T>();
 
@@ -45,7 +41,7 @@ public class BaseRepository<T>(AppDbContext appDbContext) : IBaseRepository<T> w
 
     public async Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> predicate, string[] includes = null)
     {
-        IQueryable<T> values =  _appDbContext.Set<T>();
+        IQueryable<T> values = _appDbContext.Set<T>();
 
         if (includes != null)
         {
@@ -57,32 +53,43 @@ public class BaseRepository<T>(AppDbContext appDbContext) : IBaseRepository<T> w
         return await values.Where(predicate).ToListAsync();
     }
 
-    public async Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> predicate,  int? skip = null, int? take = null,
-        string OrderByDirection = OrderByStrings.Ascending , Expression<Func<T, object>> orderByFunc = null, string[] includes = null)
+    public async Task<IEnumerable<T>> FindAll(Expression<Func<T, bool>> predicate, int? skip = null, int? take = null,
+        string orderByDirection = OrderByStrings.Ascending, Expression<Func<T, object>> orderByFunc = null, string[] includes = null)
     {
         IQueryable<T> values = _appDbContext.Set<T>().Where(predicate);
 
-        if (skip.HasValue)
-            values = values.Skip<T>(skip.Value);
-        if (take.HasValue)
-            values = values.Take<T>(take.Value);
+        if (includes != null)
+        {
+            foreach (var include in includes)
+            {
+                values = values.Include(include);
+            }
+        }
 
         if (orderByFunc != null)
         {
-            if (OrderByDirection == OrderByStrings.Ascending)
-            values = values.OrderBy(orderByFunc);
-            else
-                values = values.OrderByDescending(orderByFunc);
+            values = orderByDirection == OrderByStrings.Ascending ? values.OrderBy(orderByFunc) : values.OrderByDescending(orderByFunc);
+        }
+
+        if (skip.HasValue)
+        {
+            values = values.Skip(skip.Value);
+        }
+
+        if (take.HasValue)
+        {
+            values = values.Take(take.Value);
         }
 
         return await values.ToListAsync();
     }
 
+    // AnyAscync
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate) => await _appDbContext.Set<T>().AnyAsync(predicate);
 
-    public async Task Add(T item) => await _appDbContext.Set<T>().AddAsync(item);
+    public async Task AddAsync(T item) => await _appDbContext.Set<T>().AddAsync(item);
 
-    public async Task Update(T item) => _appDbContext.Set<T>().Update(item);
+    public async Task UpdateAsync(T item) => _appDbContext.Set<T>().Update(item);
 
-    public async Task Delete(int Id) =>   _appDbContext.Remove(await _appDbContext.FindAsync<T>(Id));
-
+    public async Task DeleteAsync(int id) => _appDbContext.Remove(await _appDbContext.FindAsync<T>(id));
 }
