@@ -1,56 +1,90 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using RepositoryWithUOW.Core.AutoMapperProfiles;
-using RepositoryWithUOW.Core.Entites;
-using RepositoryWithUOW.Core.Interfaces;
-using RepositoryWithUOW.Core.Services;
-using RepositoryWithUWO.Core.Helper;
-using RepositoryWithUWO.EF;
-using RepositoryWithUWO.EF.Repositories;
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.RegisterCoreServices();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddControllers().AddJsonOptions(option => // this is for ignore the loop reference in json , this Problem occurs when we have a loop reference in our model
+{
+    option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 
-var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+
+// Swagger 
+builder.Services.AddSwaggerGen(c =>
+{
+    var provider = builder.Services.BuildServiceProvider().GetRequiredService<IApiDescriptionGroupCollectionProvider>();
+    var endpointCount = provider.ApiDescriptionGroups.Items.SelectMany(group => group.Items).Count();
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "BookNest APi Documenation",
+        Description = $"Here Are {endpointCount} Endpoints",
+        Version = "v1 Last Update 2024-12-22"
+
+    });
+
+    // Optional: Set the comments path for the Swagger JSON and UI.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+
+    // Add security definition for Bearer token
+    //c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    //{
+    //    Description = "JWT Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+    //    Name = "Authorization",
+    //    In = ParameterLocation.Header,
+    //    Type = SecuritySchemeType.ApiKey,
+    //    Scheme = "Bearer"
+    //});
+
+    // Add security requirement for Bearer token
+    //c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    //{
+    //    {
+    //        new OpenApiSecurityScheme
+    //        {
+    //            Reference = new OpenApiReference
+    //            {
+    //                Type = ReferenceType.SecurityScheme,
+    //                Id = "Bearer"
+    //            }
+    //        },
+    //        new string[] {}
+    //    }
+    //});
+});
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new(1, 0);
+});
+
+
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 builder.Services.AddSingleton(jwtOptions);
 
-
 // register EF
-var Constr = builder.Configuration.GetSection("ConnectionsStrings:ProductionConnection").Value;
+var connectionString = builder.Configuration.GetConnectionString("ProductionConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseSqlServer(Constr,
-b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
-
-
+    options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 // register Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.Password.RequireDigit = true;
+    options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredUniqueChars = 0;
-    options.Password.RequiredLength = 5;
+    options.Password.RequiredLength = 4;
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
-
-
-
-// register objects
-builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IAuthServices, AuthServices>();
-builder.Services.AddAutoMapper(typeof(ProfileMapper).Assembly);
-
-
 
 // register authentication
 builder.Services.AddAuthentication(options =>
@@ -73,16 +107,18 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-
 var app = builder.Build();
 
-
-
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Book Nest API V1");
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        //op.RouteTemplate = "/openapi/{documentName}.json";
+        c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Wellcome to BookNest API v1");
+    });
+}
 
 app.Use(async (context, next) =>
 {
@@ -95,11 +131,8 @@ app.Use(async (context, next) =>
 });
 
 app.UseRouting();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
+app.UseMiddleware<ModelStateValidationMiddleware>();
 app.MapControllers();
-
 app.Run();

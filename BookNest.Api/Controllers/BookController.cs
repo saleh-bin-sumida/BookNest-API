@@ -1,31 +1,38 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RepositoryWithUOW.Core.Constants;
-using RepositoryWithUOW.Core.DTOs;
-using RepositoryWithUOW.Core.Entites;
-using RepositoryWithUOW.Core.Interfaces;
+﻿
 
 namespace RepositoryWithUOW.Api.Controllers
 {
     [ApiController]
-    [Route("api/book")]
-    public class BookController(IUnitOfWork unitOfWork, IMapper mapper) : ControllerBase
-    {
-        private readonly IUnitOfWork _unitOfWork = unitOfWork;
-        private readonly IMapper _mapper = mapper;
+    [Route("api/v1/books")]
+    [ApiVersion("1.0")]
 
+    public class BookController(IUnitOfWork _unitOfWork, IMapper _mapper) : ControllerBase
+    {
+
+        /// <summary>
+        /// الحصول على جميع الكتب.
+        /// </summary>
+        /// <returns>قائمة الكتب.</returns>
         [HttpGet]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> GetBooksAsync()
         {
-            var books = await _unitOfWork.Books.IndexAsync();
+            var books = await _unitOfWork.Books.GetAllAsync();
             return Ok(_mapper.Map<IEnumerable<BookDTO>>(books));
         }
 
+        /// <summary>
+        /// الحصول على كتاب بواسطة المعرف.
+        /// </summary>
+        /// <param name="id">معرف الكتاب.</param>
+        /// <returns>الكتاب المطلوب.</returns>
         [HttpGet("{id}")]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> GetBookById(int id)
         {
-            var book = await _unitOfWork.Books.Find(x => x.Id == id);
+            var book = await _unitOfWork.Books.FindAsync(x => x.Id == id);
             if (book == null)
             {
                 return NotFound();
@@ -33,10 +40,17 @@ namespace RepositoryWithUOW.Api.Controllers
             return Ok(_mapper.Map<BookDTO>(book));
         }
 
-        [HttpGet("GetBookByTitle")]
+        /// <summary>
+        /// الحصول على كتاب بواسطة العنوان.
+        /// </summary>
+        /// <param name="title">عنوان الكتاب.</param>
+        /// <returns>الكتاب المطلوب.</returns>
+        [HttpGet("ByTitle")]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> GetBookByTitle(string title)
         {
-            var book = await _unitOfWork.Books.Find(x => x.Title == title, new string[] { "Author" });
+            var book = await _unitOfWork.Books.FindAsync(x => x.Title == title, ["Author"]);
             if (book == null)
             {
                 return NotFound();
@@ -44,58 +58,94 @@ namespace RepositoryWithUOW.Api.Controllers
             return Ok(_mapper.Map<BookDTO>(book));
         }
 
-        [HttpGet("GetAllBooksWithAuthorId")]
-        public async Task<IActionResult> GetAllBooksWithAuthorId(int authorId)
+        /// <summary>
+        /// الحصول على جميع الكتب بواسطة معرف المؤلف.
+        /// </summary>
+        /// <param name="authorId">معرف المؤلف.</param>
+        /// <returns>قائمة الكتب.</returns>
+        [HttpGet("ByAuthor")]
+        [Authorize(Roles = "User")]
+
+        public async Task<IActionResult> GetBooksByAuthorId(int authorId)
         {
-            var books = await _unitOfWork.Books.FindAll(x => x.AuthorId == authorId, new string[] { "Author" });
+            var books = await _unitOfWork.Books.FindAll(x => x.AuthorId == authorId, ["Author"]);
             return Ok(_mapper.Map<IEnumerable<BookDTO>>(books));
         }
 
-        [HttpGet("GetAllBooksOrdered")]
-        public async Task<IActionResult> GetAllBooksOrdered(int authorId)
+        /// <summary>
+        /// الحصول على جميع الكتب مرتبة بواسطة معرف المؤلف.
+        /// </summary>
+        /// <param name="parameters">معلمات الاستعلام عن الكتاب.</param>
+        /// <returns>قائمة الكتب مرتبة.</returns>
+        [HttpGet("Pagenated")]
+        [Authorize(Roles = "User")]
+
+        public async Task<IActionResult> GetAllBooksOrderedBy([FromQuery] BookQueryParameters parameters)
         {
-            var books = await _unitOfWork.Books.FindAll(x => x.AuthorId == authorId, 1, 2, OrderByStrings.Ascending, x => x.Id, new string[] { "Author" });
+            var orderByDirection = parameters.OrderByDirection == "ASC" ? OrderByStrings.Ascending : OrderByStrings.Desending;
+            var books = await _unitOfWork.Books.FindAll(
+                x => x.AuthorId == parameters.AuthorId,
+                parameters.Skip,
+                parameters.Take,
+                orderByDirection,
+                x => EF.Property<object>(x, parameters.PropertyName), ["Author"]
+            );
             return Ok(_mapper.Map<IEnumerable<BookDTO>>(books));
         }
 
-        [HttpPost("AddBook")]
+        /// <summary>
+        /// إضافة كتاب جديد.
+        /// </summary>
+        /// <param name="bookDto">بيانات الكتاب.</param>
+        /// <returns>معرف الكتاب المضاف.</returns>
+        [HttpPost]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> AddBook(BookDTO bookDto)
         {
+            if (!await _unitOfWork.Authors.AnyAsync(x => x.Id == bookDto.AuthorId))
+                return BadRequest("معرف المؤلف غير صالح");
+
             var newBook = _mapper.Map<Book>(bookDto);
-            newBook.Id = 0;
-            await _unitOfWork.Books.Add(newBook);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Books.AddAsync(newBook);
+            await _unitOfWork.SaveAsync();
             return Ok(newBook.Id);
         }
 
-        [HttpPut("UpdateBook")]
+        /// <summary>
+        /// تحديث بيانات الكتاب.
+        /// </summary>
+        /// <param name="bookDto">بيانات الكتاب المحدثة.</param>
+        /// <returns>معرف الكتاب المحدث.</returns>
+        [HttpPut]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> UpdateBook(BookDTO bookDto)
         {
+            if (!await _unitOfWork.Authors.AnyAsync(x => x.Id == bookDto.AuthorId))
+                return BadRequest("معرف المؤلف غير صالح");
+
             var updatedBook = _mapper.Map<Book>(bookDto);
-            await _unitOfWork.Books.Update(updatedBook);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Books.UpdateAsync(updatedBook);
+            await _unitOfWork.SaveAsync();
             return Ok(updatedBook.Id);
         }
 
-        [HttpDelete("DeleteBook")]
+        /// <summary>
+        /// حذف كتاب بواسطة المعرف.
+        /// </summary>
+        /// <param name="bookId">معرف الكتاب.</param>
+        /// <returns>معرف الكتاب المحذوف.</returns>
+        [HttpDelete]
+        [Authorize(Roles = "User")]
+
         public async Task<IActionResult> DeleteBook(int bookId)
         {
-            await _unitOfWork.Books.Delete(bookId);
-            await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Books.DeleteAsync(bookId);
+            await _unitOfWork.SaveAsync();
             return Ok(bookId);
         }
 
-        [AllowAnonymous]
-        [Authorize]
-        [HttpGet("SpecialForBooks")]
-        public IActionResult SpecialForBooks()
-        {
-            _unitOfWork.Books.SpecialMethodForBooks();
-            if (User.IsInRole("manager"))
-            {
-                return Ok();
-            }
-            return Forbid();
-        }
     }
 }
+
