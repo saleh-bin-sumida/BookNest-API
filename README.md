@@ -1,3 +1,5 @@
+Here is the rewritten README file for the BookNest API repository, updated for .NET 9:
+
 # BookNest API
 
 BookNest API is a robust and scalable API designed to manage books and authors. It follows a 3-tier architecture and implements various design patterns and technologies to ensure maintainability, efficiency, and security.
@@ -14,42 +16,41 @@ BookNest API is a robust and scalable API designed to manage books and authors. 
 
 ## Technologies Used
 
-- **.NET 8**
-- **C# 12.0**
-- **Entity Framework Core 8.0.7**
+- **.NET 9**
+- **C#**
+- **Entity Framework Core**
 - **AutoMapper**
 - **Microsoft Identity**
-- **Swashbuckle (Swagger) 6.4.0**
+- **Swashbuckle (Swagger)**
 
 ## Getting Started
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 
 ### Installation
 
 1. Clone the repository:
-    git clone https://github.com/your-repo/BookNest.git
-cd BookNest
-
+   ```
+   git clone https://github.com/saleh-bin-sumida/BookNest-API.git
+   cd BookNest-API
+   ```
 
 2. Set up the database:
-    - Update the connection string in `appsettings.json` to point to your SQL Server instance.
-    - Run the following commands to apply migrations and create the database:
-    - `dotnet ef database update --project BookNest.EF`
-    
-    
+   - Update the connection string in `appsettings.json` to point to your SQL Server instance.
+   - Run the following commands to apply migrations and create the database:
+     ```
+     dotnet ef database update --project BookNest.EF
+     ```
+
 3. Build and run the solution:
+   ```
+   dotnet build
+   dotnet run --project BookNest.Api
+   ```
 
- `dotnet build ` 
-
- `dotnet run --project BookNest.Api` 
-
-
-
-    
 ### Usage
 
 - The API will be available at `https://localhost:5001` or `http://localhost:5000`.
@@ -65,7 +66,6 @@ cd BookNest
 - `POST /api/author/AddAuthor`: Add a new author.
 - `PUT /api/author/UpdateAuthor`: Update an existing author.
 - `DELETE /api/author/DeleteAuthor?authorId={authorId}`: Delete an author by ID.
-
 
 ### Books
 
@@ -94,3 +94,5 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ## License
 
 This project is licensed under the MIT License.
+
+You can find the current README file [here](https://github.com/saleh-bin-sumida/BookNest-API/blob/31c0963b6e5e71cbc5c1ff374b4ac48d34b7e436/README.md).
