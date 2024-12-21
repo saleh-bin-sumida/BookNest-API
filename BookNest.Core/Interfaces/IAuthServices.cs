@@ -1,14 +1,8 @@
-﻿using RepositoryWithUOW.Core.Entites;
-using RepositoryWithUOW.Core.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RepositoryWithUOW.Core.Models;
 
 namespace RepositoryWithUOW.Core.Interfaces;
 
-public interface IAuthServices //: IBaseRepository<User>
+public interface IAuthServices
 {
     public Task<AuthModel> RegisterUserAsync(RegisterModel model);
 
