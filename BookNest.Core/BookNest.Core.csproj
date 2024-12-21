@@ -9,10 +9,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
   </ItemGroup>
 
 </Project>
