@@ -133,6 +133,5 @@ app.Use(async (context, next) =>
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthorization();
-app.UseMiddleware<ModelStateValidationMiddleware>();
 app.MapControllers();
 app.Run();
