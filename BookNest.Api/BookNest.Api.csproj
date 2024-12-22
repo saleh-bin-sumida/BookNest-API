@@ -32,6 +32,7 @@
 	<PropertyGroup>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<DocumentationFile>bin\Debug\net9.0\BookNest.Api.xml</DocumentationFile>
+		<UserSecretsId>15b01309-869f-4416-90a5-05ee7506a4d7</UserSecretsId>
 	</PropertyGroup>
 
 </Project>

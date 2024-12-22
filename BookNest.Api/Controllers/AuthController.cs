@@ -4,8 +4,9 @@ namespace RepositoryWithUWO.Api.Controllers;
 
 [Route("api/v1/auth")]
 [ApiController]
-public class AuthController(IAuthServices _userServices) : ControllerBase
+public class AuthController(IAuthServices _userServices, IConfiguration configuration) : ControllerBase
 {
+
     [HttpPost("Register")]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterModel registerModel)
     {
