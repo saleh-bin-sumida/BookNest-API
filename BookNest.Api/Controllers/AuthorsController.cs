@@ -4,7 +4,8 @@ namespace RepositoryWithUOW.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/authors")]
-    [ApiVersion("1.0")]
+    [Authorize(Roles = "User")]
+
     public class AuthorsController(IUnitOfWork _unitOfWork, IMapper _mapper) : ControllerBase
     {
 

@@ -3,7 +3,6 @@
 
 
 // exsample of usings 
-global using Asp.Versioning;
 global using AutoMapper;
 global using BookNest.Core.Models;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;

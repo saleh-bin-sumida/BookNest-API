@@ -4,8 +4,7 @@ namespace RepositoryWithUOW.Api.Controllers
 {
     [ApiController]
     [Route("api/v1/books")]
-    [ApiVersion("1.0")]
-
+    [Authorize(Roles = "User")]
     public class BookController(IUnitOfWork _unitOfWork, IMapper _mapper) : ControllerBase
     {
 
