@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RepositoryWithUOW.Core.Entites;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RepositoryWithUWO.EF;
+namespace BookNest.EF.Data;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser>
 {

@@ -4,7 +4,9 @@
 
 // exsample of usings 
 global using AutoMapper;
+global using BookNest.Api;
 global using BookNest.Core.Models;
+global using BookNest.EF;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Identity;
@@ -20,7 +22,6 @@ global using RepositoryWithUOW.Core.Interfaces;
 global using RepositoryWithUOW.Core.Models;
 global using RepositoryWithUWO.Core.Helper;
 global using RepositoryWithUWO.EF;
-global using RepositoryWithUWO.EF.Repositories;
 global using System.Reflection;
 global using System.Text;
 global using System.Text.Json.Serialization;
